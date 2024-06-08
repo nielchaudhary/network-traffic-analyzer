@@ -1,15 +1,18 @@
 import pcap from 'pcap';
 
+export const pcapSesh = () => {
+    const pcapSession = pcap.createSession('en0');
+    let packetCount = 0;
+    let protocolDistribution: { [key: string]: number } = {};
+    let packetSizeDistribution: { [key: string]: number } = {};
 
-export const pcapSesh = () =>{
+    pcapSession.on('packet', (rawPacket: Buffer) => {
+        packetCount++;
 
-const pcapSession = pcap.createSession('en0'); 
+        const packet = pcap.decode.packet(rawPacket);
 
-pcapSession.on('packet', (rawPacket: Buffer) => {
-    const packet = pcap.decode.packet(rawPacket);
-    console.log(packet);
-});
+        const protocol = packet.payload?.payload?.protocol;
+        protocolDistribution[protocol] = (protocolDistribution[protocol] || 0) + 1;
 
-
-
-}
+    });
+};
