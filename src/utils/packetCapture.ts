@@ -1,6 +1,6 @@
 import pcap from 'pcap';
 
-export const pcapSesh = () => {
+export const createPcapSession = () => {
     const pcapSession = pcap.createSession('en0');
     let packetCount = 0;
     let protocolDistribution: { [key: string]: number } = {};
@@ -13,7 +13,7 @@ export const pcapSesh = () => {
 
         const protocol = packet.payload?.payload?.protocol;
         protocolDistribution[protocol] = (protocolDistribution[protocol] || 0) + 1;
-        
+
         const packetSize = packet.pcap_header?.caplen;
         packetSizeDistribution[packetSize] = (packetSizeDistribution[packetSize] || 0) + 1;
 
