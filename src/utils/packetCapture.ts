@@ -1,31 +1,50 @@
 import pcap from 'pcap';
 
+interface ProtocolDistribution {
+    [key: string]: number;
+}
+
+interface PacketSizeDistribution {
+    [key: number]: number;
+}
+
 export const createPcapSession = () => {
     const pcapSession = pcap.createSession('en0');
     let packetCount = 0;
-    let protocolDistribution: { [key: string]: number } = {};
-    let packetSizeDistribution: { [key: string]: number } = {};
+    let protocolDistribution: ProtocolDistribution = {};
+    let packetSizeDistribution: PacketSizeDistribution = {};
 
     pcapSession.on('packet', (rawPacket: Buffer) => {
         packetCount++;
 
         const packet = pcap.decode.packet(rawPacket);
+        const ethernetPacket = packet.payload;
+        const ipPacket = ethernetPacket?.payload;
+        const tcpPacket = ipPacket.payload;
 
-        const protocol = packet.payload?.payload?.protocol;
+        const srcIP = ipPacket.saddr.addr.join('.');
+       const  dstIP = ipPacket.daddr.addr.join('.');
+       const srcPort = tcpPacket.sport;
+       const dstPort = tcpPacket.dport;
+
+
+
+        const protocol = ipPacket?.protocol || 'unknown';
+        const packetSize = packet.pcap_header?.caplen || 0;
+
         protocolDistribution[protocol] = (protocolDistribution[protocol] || 0) + 1;
-
-        const packetSize = packet.pcap_header?.caplen;
         packetSizeDistribution[packetSize] = (packetSizeDistribution[packetSize] || 0) + 1;
 
-
-        setInterval(() => {
-            console.log('-- Metrics Summary --');
-            console.log(`Total Packets: ${packetCount}`);
-            console.log('Protocol Distribution:');
-            console.log(protocolDistribution);
-            console.log('Packet Size Distribution:');
-            console.log(packetSizeDistribution);
-        }, 60000); 
-
+        console.log({
+            ipPacket,
+            srcIP : srcIP,
+            dstIP : dstIP,
+            srcPort : srcPort,
+            dstPort : dstPort
+            
+        })
     });
+
+  
+
 };
