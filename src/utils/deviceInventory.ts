@@ -51,3 +51,9 @@ export const getDeviceInventory = () => {
         traffic: device.traffic
     }));
 };
+
+
+//Reasons for Storing Addresses : 
+// MAC Addresses: These are used to uniquely identify devices. Unlike IP addresses, which can change, MAC addresses are generally fixed and unique to each device's network interface.
+// IP Addresses: Storing IP addresses helps track the network activity of each device, as devices might obtain different IP addresses over time due to DHCP or network changes. Knowing the IP addresses associated with each MAC address can be useful for network analysis and troubleshooting.
+// Traffic: Monitoring the amount of data sent and received by each device helps in understanding the network load and identifying devices that are consuming excessive bandwidth.
